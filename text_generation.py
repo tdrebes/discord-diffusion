@@ -4,9 +4,7 @@ TEXTGEN_HOST = 'localhost:5000'
 TEXTGEN_URI = f'http://{TEXTGEN_HOST}/api/v1/chat'
 
 class TextGenerator:
-    def generate(self, user, prompt, context = ''):
-        history = {'internal': [], 'visible': []} # TODO save/load user specific history
-
+    def generate(self, user, prompt, context = '', history = {'internal': [], 'visible': []}):
         # TODO personality, context, etc
         payload = {
             'user_input': prompt,

@@ -6,9 +6,11 @@ from discord.ext.commands.context import Context
 from discord.message import Message
 
 from text_generation import TextGenerator
+from database import Database
 
 class DiscordBot(commands.Bot):
     def __init__(self, command_prefix, game_name):
+        self.db = Database()
         self.config = configparser.ConfigParser()
         self.config.read_file(open('bot_config.ini'))
         intents = discord.Intents.default()
@@ -32,10 +34,18 @@ class DiscordBot(commands.Bot):
             if self.user in msg.mentions:
                 text_generator = TextGenerator()
 
+                # TODO: move all context and history stuff into textgenerator + configs
                 context = f'{self.user.display_name} is a very rude person that instantly starts insulting people.'
-                results = text_generator.generate(user=msg.author.name, prompt=msg.clean_content, context=context)
+                history = json.loads(self.db.get_history(msg.author.id))
+
+                if type(history) is not None:
+                    results = text_generator.generate(user=msg.author.name, prompt=msg.clean_content, context=context, history=history)
+                else:
+                    results = text_generator.generate(user=msg.author.name, prompt=msg.clean_content, context=context)
+
+                self.db.set_history(msg.author.id, results)
+
                 result_message = results['visible'][-1][-1]
-                
                 print(f'Answer: {result_message}')
                 await msg.reply(result_message)
 

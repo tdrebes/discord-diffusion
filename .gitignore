@@ -1,3 +1,4 @@
 .vscode
 bot_config.ini
 __pycache__
+data.db
