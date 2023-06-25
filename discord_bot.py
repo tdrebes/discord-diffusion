@@ -5,6 +5,7 @@ from discord.ext import commands
 from discord.ext.commands.context import Context
 from discord.message import Message
 
+from text_generation import TextGenerator
 
 class DiscordBot(commands.Bot):
     def __init__(self, command_prefix, game_name):
@@ -26,7 +27,17 @@ class DiscordBot(commands.Bot):
             if msg.author == self.user:
                 return
 
-            print(f'{msg.guild}/{msg.author}: {msg.content}')
+            print(f'{msg.guild}/{msg.author}: {msg.clean_content}')
+
+            if self.user in msg.mentions:
+                text_generator = TextGenerator()
+
+                context = f'{self.user.display_name} is a very rude person that instantly starts insulting people.'
+                results = text_generator.generate(user=msg.author.name, prompt=msg.clean_content, context=context)
+                result_message = results['visible'][-1][-1]
+                
+                print(f'Answer: {result_message}')
+                await msg.reply(result_message)
 
             await self.process_commands(msg)
 
@@ -48,7 +59,7 @@ class DiscordBot(commands.Bot):
             if not isinstance(messages[msg.author.id], list):
                 messages[msg.author.id] = []
 
-            messages[msg.author.id].append(msg.content)
+            messages[msg.author.id].append(msg.clean_content)
 
         return messages
 
