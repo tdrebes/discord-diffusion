@@ -1,5 +1,6 @@
 import configparser
 import json
+from types import NoneType
 import discord
 from discord.ext import commands
 from discord.ext.commands.context import Context
@@ -36,10 +37,10 @@ class DiscordBot(commands.Bot):
 
                 # TODO: move all context and history stuff into textgenerator + configs
                 context = f'{self.user.display_name} is a very rude person that instantly starts insulting people.'
-                history = json.loads(self.db.get_history(msg.author.id))
+                history = self.db.get_history(msg.author.id)
 
-                if type(history) is not None:
-                    results = text_generator.generate(user=msg.author.name, prompt=msg.clean_content, context=context, history=history)
+                if type(history) is not NoneType:
+                    results = text_generator.generate(user=msg.author.name, prompt=msg.clean_content, context=context, history=json.loads(history))
                 else:
                     results = text_generator.generate(user=msg.author.name, prompt=msg.clean_content, context=context)
 
