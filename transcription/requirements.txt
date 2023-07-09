@@ -1,0 +1,4 @@
+SpeechRecognition
+torch -f https://download.pytorch.org/whl/torch_stable.html
+git+https://github.com/openai/whisper.git
+pyaudio
